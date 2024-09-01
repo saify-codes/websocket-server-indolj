@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io('localhost:3000?merchantId=12')
+      const socket = io("localhost:3000?merchantId=12", {
+        upgrade: false,
+        transports: ["websocket"],
+      });
 
-        socket.on('message', (message)=>{
-            console.log(message);
-        })
+      socket.on("broadcast", (message) => {
+        console.log(message);
+      });
     </script>
-</body>
+  </body>
 </html>

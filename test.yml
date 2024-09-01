@@ -1,0 +1,45 @@
+# config:
+#   target: "http://localhost:3000"  # Replace with your server URL and port
+#   phases:
+#     - duration: 30                # Duration of the test phase in seconds
+#       arrivalRate: 1000           # Number of new virtual users to add per second
+# scenarios:
+#   - engine: "socketio"
+#     options:
+#       socketio:
+#         transports: ["websocket"] # Use WebSocket transport only
+#         upgrade: false            # Disable transport upgrade
+#     flow:
+#       - think: 120                 # Wait for 120 seconds to maintain the connection
+
+
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  engines:
+   socketio-v3: {}
+
+scenarios:
+  - name: My sample scenario
+    engine: socketio-v3
+    flow:
+      # wait for the WebSocket upgrade (optional)
+      - think: 1
+
+      # basic emit
+      - emit:
+          channel: "hello"
+          data: "world"
+
+
+      # emit with acknowledgement
+      - emit:
+          channel: "ping"
+        acknowledge:
+          match:
+            value: "pong"
+
+      # do nothing for 30 seconds then disconnect
+      - think: 30
