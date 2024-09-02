@@ -1,10 +1,8 @@
 import { io } from "socket.io-client";
 
 const URL = process.env.URL || "http://localhost:3000";
-const MAX_CLIENTS = 10_000;
-const POLLING_PERCENTAGE = 0;
-const CLIENT_CREATION_INTERVAL_IN_MS = 10;
-const EMIT_INTERVAL_IN_MS = 10000;
+const MAX_CLIENTS = 20_000;
+const CLIENT_CREATION_INTERVAL_IN_MS = 1;
 
 let clientCount = 0;
 let lastReport = new Date().getTime();
@@ -18,9 +16,6 @@ const createClient = () => {
     transports,
   });
 
-  setInterval(() => {
-    // socket.emit("ping", "Hello from client");
-  }, EMIT_INTERVAL_IN_MS);
 
   // Add this listener to receive the 'stress-test' event from the server
   socket.on("broadcast", (data) => {

@@ -1,13 +1,26 @@
-import { createServer } from "node:http";
-import { Server as socketServer } from "socket.io";
-import { availableParallelism } from "node:os";
-import { createAdapter, setupPrimary } from "@socket.io/cluster-adapter";
-import { join } from "node:path";
 import { cwd } from "node:process";
+import { join } from "node:path";
+import { Redis } from "ioredis";
+import { createServer } from "node:http";
+import { availableParallelism } from "node:os";
+import { Server as socketServer } from "socket.io";
+import { createAdapter, setupPrimary } from "@socket.io/cluster-adapter";
+
 import cluster from "node:cluster";
 import express from "express";
 
 if (cluster.isPrimary) {
+  const redis = new Redis();
+
+  redis.subscribe("private", (err, count) => {
+    if (err) console.log(`FAILED: ${err.message}`);
+    else console.log("SUBSCRIBED CHANNEL: private");
+  });
+
+  redis.on("message", (channel, message) => {
+    console.log(`Received ${message} from ${channel}`);
+  });
+
   const numCpus = availableParallelism();
   let totalClients = 0; // Shared variable to record total clients count
 
@@ -56,10 +69,13 @@ if (cluster.isPrimary) {
       process.send({ type: "client-disconnected" });
     });
 
-    socket.on('ping', () => {
-      io.emit('broadcast', 'PONG');
+    socket.on("ping", () => {
+      io.emit("broadcast", "PONG");
     });
 
+    socket.on('broadcast', (msg)=>{
+      socket.broadcast.emit('broadcast', msg)
+    })
   });
 
   app.get("/", (req, res) => {

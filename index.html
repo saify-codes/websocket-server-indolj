@@ -8,7 +8,7 @@
   <body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      const socket = io("localhost:3000?merchantId=12", {
+      const socket = io({
         upgrade: false,
         transports: ["websocket"],
       });
